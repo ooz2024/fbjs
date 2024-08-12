@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报价网站</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        .section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .section label {
+            width: 120px;
+            font-size: 14px;
+            color: #333;
+            text-align: left;
+            padding-left: 10px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+        .section input {
+            flex: 1;
+            width: 80px;
+            padding: 6px;
+            margin-left: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .section p {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            white-space: nowrap;
+        }
+        .section p span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .total-cost {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+        }
+        .total-cost span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>报价计算器</h2>
+
+        <div class="section">
+            <label for="pricePerKg">物料：</label>
+            <input type="number" id="pricePerKg" value="42" placeholder="每公斤/元">
+            <input type="number" id="weight" placeholder="公斤数">
+            <p><span id="weightCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="machiningCostPerHour">CNC：</label>
+            <input type="number" id="machiningCostPerHour" value="40" placeholder="每小时/元">
+            <input type="number" id="machiningHours" placeholder="小时数">
+            <p><span id="machiningCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="processingCostPerHour">下加工：</label>
+            <input type="number" id="processingCostPerHour" value="40" placeholder="每小时/元">
+            <input type="number" id="processingHours" placeholder="小时数">
+            <p><span id="processingCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="heatTreatmentCostPerKg">热处理：</label>
+            <input type="number" id="heatTreatmentCostPerKg" value="10" placeholder="每公斤/元">
+            <input type="number" id="heatTreatmentWeight" placeholder="公斤数">
+            <p><span id="heatTreatmentCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="cuttingPricePerHour">线割：</label>
+            <input type="number" id="cuttingPricePerHour" value="60" placeholder="每小时/元">
+            <input type="number" id="cuttingTime" placeholder="小时数">
+            <p><span id="cuttingCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="edmCostPerPiece">放电：</label>
+            <input type="number" id="edmCostPerPiece" value="50" placeholder="每个/元">
+            <input type="number" id="edmQuantity" placeholder="数量">
+            <p><span id="edmCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="laborCostPerHour">人工：</label>
+            <input type="number" id="laborCostPerHour" value="40" placeholder="每小时/元">
+            <input type="number" id="laborHours" placeholder="小时数">
+            <p><span id="laborCost">0</span> 元</p>
+        </div>
+
+        <div class="section">
+            <label for="profitPercentage">利润：</label>
+            <input type="number" id="profitPercentage" placeholder="%">
+            <p><span id="profitCost">0</span> 元</p>
+        </div>
+
+        <button onclick="calculatePrice()">计算费用</button>
+
+        <div class="total-cost">
+            税前总费用为: <span id="preTaxTotalCost">0</span> 元<br>
+            税后总费用为: <span id="postTaxTotalCost">0</span> 元
+        </div>
+    </div>
+
+    <script>
+        function calculatePrice() {
+            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value); // 每公斤价格
+            const cuttingPricePerHour = parseFloat(document.getElementById('cuttingPricePerHour').value); // 线切割每小时价格
+            const edmCostPerPiece = parseFloat(document.getElementById('edmCostPerPiece').value); // 放电每个费用
+            const edmQuantity = parseFloat(document.getElementById('edmQuantity').value); // 放电数
+            const machiningCostPerHour = parseFloat(document.getElementById('machiningCostPerHour').value); // CNC每小时费用
+            const processingCostPerHour = parseFloat(document.getElementById('processingCostPerHour').value); // 下加工每小时费用
+            const laborCostPerHour = parseFloat(document.getElementById('laborCostPerHour').value); // 人工每小时费用
+            const heatTreatmentCostPerKg = parseFloat(document.getElementById('heatTreatmentCostPerKg').value); // 热处理每公斤价格
+            const heatTreatmentWeight = parseFloat(document.getElementById('heatTreatmentWeight').value); // 热处理公斤数
+            const profitPercentage = parseFloat(document.getElementById('profitPercentage').value); // 利润百分比
+
+            const weight = parseFloat(document.getElementById('weight').value);
+            const cuttingTime = parseFloat(document.getElementById('cuttingTime').value);
+            const machiningHours = parseFloat(document.getElementById('machiningHours').value);
+            const processingHours = parseFloat(document.getElementById('processingHours').value);
+            const laborHours = parseFloat(document.getElementById('laborHours').value);
+
+            const weightCostElement = document.getElementById('weightCost');
+            const cuttingCostElement = document.getElementById('cuttingCost');
+            const edmCostElement = document.getElementById('edmCost');
+            const machiningCostElement = document.getElementById('machiningCost');
+            const processingCostElement = document.getElementById('processingCost');
+            const laborCostElement = document.getElementById('laborCost');
+            const heatTreatmentCostElement = document.getElementById('heatTreatmentCost');
+            const profitCostElement = document.getElementById('profitCost');
+            const preTaxTotalCostElement = document.getElementById('preTaxTotalCost');
+            const postTaxTotalCostElement = document.getElementById('postTaxTotalCost');
+
+            let weightCost = 0;
+            let cuttingCost = 0;
+            let edmCost = 0;
+            let machiningCost = 0;
+            let processingCost = 0;
+            let laborCost = 0;
+            let heatTreatmentCost = 0;
+            let profitCost = 0;
+
+            if (!isNaN(weight) && weight > 0 && !isNaN(pricePerKg) && pricePerKg > 0) {
+                weightCost = weight * pricePerKg;
+            }
+
+            if (!isNaN(cuttingTime) && cuttingTime > 0 && !isNaN(cuttingPricePerHour) && cuttingPricePerHour > 0) {
+                cuttingCost = cuttingTime * cuttingPricePerHour;
+            }
+
+            if (!isNaN(edmQuantity) && edmQuantity > 0 && !isNaN(edmCostPerPiece) && edmCostPerPiece > 0) {
+                edmCost = edmQuantity * edmCostPerPiece;
+            }
+
+            if (!isNaN(machiningHours) && machiningHours > 0 && !isNaN(machiningCostPerHour) && machiningCostPerHour > 0) {
+                machiningCost = machiningHours * machiningCostPerHour;
+            }
+
+            if (!isNaN(processingHours) && processingHours > 0 && !isNaN(processingCostPerHour) && processingCostPerHour > 0) {
+                processingCost = processingHours * processingCostPerHour;
+            }
+
+            if (!isNaN(laborHours) && laborHours > 0 && !isNaN(laborCostPerHour) && laborCostPerHour > 0) {
+                laborCost = laborHours * laborCostPerHour;
+            }
+
+            if (!isNaN(heatTreatmentWeight) && heatTreatmentWeight > 0 && !isNaN(heatTreatmentCostPerKg) && heatTreatmentCostPerKg > 0) {
+                heatTreatmentCost = heatTreatmentWeight * heatTreatmentCostPerKg;
+            }
+
+            const totalCost = weightCost + cuttingCost + edmCost + machiningCost + processingCost + laborCost + heatTreatmentCost;
+
+            if (!isNaN(profitPercentage) && profitPercentage > 0) {
+                profitCost = totalCost * (profitPercentage / 100);
+            }
+
+            const preTaxTotalCost = totalCost + profitCost;
+            const postTaxTotalCost = preTaxTotalCost * 1.13; // 假设税率为13%
+
+            weightCostElement.textContent = weightCost.toFixed(2);
+            cuttingCostElement.textContent = cuttingCost.toFixed(2);
+            edmCostElement.textContent = edmCost.toFixed(2);
+            machiningCostElement.textContent = machiningCost.toFixed(2);
+            processingCostElement.textContent = processingCost.toFixed(2);
+            laborCostElement.textContent = laborCost.toFixed(2);
+            heatTreatmentCostElement.textContent = heatTreatmentCost.toFixed(2);
+            profitCostElement.textContent = profitCost.toFixed(2);
+            preTaxTotalCostElement.textContent = preTaxTotalCost.toFixed(2);
+            postTaxTotalCostElement.textContent = postTaxTotalCost.toFixed(2);
+        }
+    </script>
+</body>
+</html>
